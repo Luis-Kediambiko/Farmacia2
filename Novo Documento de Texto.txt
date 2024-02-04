@@ -1,0 +1,51 @@
+$(document).on('click','.eliminar',(e)=>{
+      funcao ="eliminar";
+      const elemento= $(this)[0].activeElement.parentElement.parentElement.parentElement.parentElement;
+      const id =$(elemento).attr('loteId');
+      const swalWithBootstrapButtons = Swal.mixin({
+          customClass: {
+            confirmButton: 'btn btn-success',
+            cancelButton: 'btn btn-danger mr-2'
+          },
+          buttonsStyling: false
+        });
+        swalWithBootstrapButtons.fire({
+          title: 'Deseja eliminar lote código '+id+' ?',
+          text: "Você não poderá reverter isto!",
+          showCancelButton: true,
+          confirmButtonText: "Sim, eliminar!",
+          cancelButtonText: "Não, cancelar!",
+          reverseButtons: true
+        }).then((result) => {
+          if (result.isConfirmed) {
+              $.post('../controlador/LoteController.php',{id,funcao},(response)=>{
+              edit=false;
+              if(response=='eliminado'){
+              swalWithBootstrapButtons.fire(
+              'Eliminado!',
+               'Lote '+id+' eliminado com sucesso.',
+               'success'
+            )
+            buscar_lote();
+              } 
+          else{
+                swalWithBootstrapButtons.fire(
+              'Não pode ser eliminado!',
+              'Lote '+id+' não pode ser eliminado porque está sendo usado.',
+              'error'
+            );
+            buscar_lote();
+          }
+              
+              })
+            
+          } else if (result.dismiss === Swal.DismissReason.cancel){
+            swalWithBootstrapButtons.fire({
+              title: "Cancelado",
+              text: 'Lote não eliminado',
+              icon: "error"
+            });
+          }
+            });
+        
+          })
